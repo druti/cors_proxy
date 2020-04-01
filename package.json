@@ -1,0 +1,23 @@
+{
+  "name": "cors_proxy",
+  "version": "0.1.0",
+  "description": "A simple proxy server that adds CORS headers.",
+  "main": "index.js",
+  "dependencies": {
+    "follow-redirects": "^1.10.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.2"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "start-unsecure": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 node index.js"
+  },
+  "keywords": [
+    "cors",
+    "proxy",
+    "nodejs"
+  ],
+  "author": "Andres Carbo",
+  "license": "MIT"
+}
