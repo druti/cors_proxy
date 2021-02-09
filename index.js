@@ -26,6 +26,12 @@ req.on('end', () => {
   const data = Buffer.concat(dataChunks);
 
   const splitUrl = proxiedUrl.split('/');
+  if (splitUrl.length <= 1) {
+    // TODO this requires further testing for general usecase
+    res.writeHead(200);
+    res.end();
+    return;
+  }
 
   let port;
   let hostname = splitUrl[2];
@@ -44,7 +50,7 @@ req.on('end', () => {
     method: req.method,
     body: data.toString(),
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': req.method.toLowerCase() === 'post' ? 'application/json' : '',
       'Content-Length': data.length,
     },
   };
@@ -65,10 +71,11 @@ req.on('end', () => {
     proxiedRes.on('end', () => {
       proxiedResData = Buffer.concat(proxiedReqDataChunks).toString();
 
+      console.log(`proxiedRes headers: `, proxiedRes.headers)
       console.log(`proxiedRes data: ${proxiedResData.slice(0, 100)}`)
 
       res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Content-Type', proxiedRes.headers['Content-Type'] || 'application/json');
+      res.setHeader('Content-Type', proxiedRes.headers['Content-Type'] || proxiedRes.headers['content-type'] || 'application/json');
       res.writeHead(proxiedRes.statusCode);
       res.write(proxiedResData);
       res.end();
@@ -80,8 +87,8 @@ req.on('end', () => {
   })
 
   proxiedReq.write(data)
-    proxiedReq.end();
-  });
+  proxiedReq.end();
+});
 });
 
 server.listen(8000, () => {
